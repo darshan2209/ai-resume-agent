@@ -1,0 +1,26 @@
+# --- Personal data — NEVER commit (keep your real resume private) ---
+base/resume.yaml
+base/resume_raw.txt
+base/resume_raw.*
+# All tailored applications contain real personal data:
+output/
+
+# Keep the anonymized template and the demo run:
+!base/resume.example.yaml
+!examples/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.Python
+
+# --- Editor / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp

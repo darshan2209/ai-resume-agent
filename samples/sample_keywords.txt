@@ -1,0 +1,11 @@
+# Keywords for the GRC working-student sample JD (one per line)
+ISO 27001
+DORA
+GDPR
+risk assessments
+compliance monitoring
+audit support
+policy documentation
+governance
+Excel
+German

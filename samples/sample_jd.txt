@@ -1,0 +1,20 @@
+Working Student - Global Compliance / IT Governance (GRC)
+Meridian Capital Services GmbH - Frankfurt am Main, Germany
+20 hours/week during the semester, up to 40 hours/week during semester breaks
+
+About the role
+Our Global Compliance team safeguards the integrity of our financial-services operations across Europe. As a working student in IT Governance, you will support the team in keeping our control framework aligned with ISO 27001, DORA and GDPR requirements while gaining hands-on experience in a regulated environment.
+
+Your responsibilities
+- Support risk assessments of IT systems, vendors and new business processes
+- Assist with compliance monitoring activities, including reviewing system flags and tracking remediation items to closure
+- Provide audit support: collect evidence, prepare documentation and follow up on findings with control owners
+- Maintain policy documentation and contribute to procedure updates within our governance framework
+- Prepare reports and dashboards for the compliance leadership team using Excel and PowerPoint
+
+Your profile
+- Enrolled Master's or Bachelor's student in information security, business informatics, law or a related field
+- First exposure to GRC frameworks (ISO 27001, NIST, DORA or similar) through studies, internships or certifications
+- Confident with MS Office, especially Excel; an analytical, structured way of working
+- Fluent English required; German is a nice-to-have
+- Available for 20h/week and able to work from our Frankfurt office regularly

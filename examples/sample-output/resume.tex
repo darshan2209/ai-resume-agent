@@ -1,0 +1,185 @@
+ comments). All values arrive pre-escaped.
+#>
+%-------------------------
+% Resume in LaTeX
+% Based on: Jake's Resume by Jake Gutierrez (MIT License)
+% https://github.com/jakegut/resume
+% Adapted: no icons, plain-text contact line, ATS-safe sections
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generated pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    \textbf{\Huge \scshape Alex Carter} \\ \vspace{1pt}
+    \small +49 151 2345 6789 $|$ \href{mailto:alex.carter@example.com}{alex.carter@example.com} $|$ \href{https://linkedin.com/in/alex-carter-example}{linkedin.com/in/alex-carter-example} $|$ Berlin, Germany
+    \\ \vspace{1pt}
+    \small\textit{Work-authorised | Open to relocating | Available immediately | Up to 20 hrs/week}
+\end{center}
+
+%-----------SUMMARY-----------
+\section{Summary}
+\begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{Business \& Information Security Master's student with hands-on experience in compliance support, policy documentation, and monitoring of flagged activity, plus a focus on process automation. Comfortable across Microsoft Office and fluent in English. Keen to apply governance and risk skills in a regulated environment. Seeking a Working Student role in Compliance / IT Governance.}}
+\end{itemize}
+
+%-----------SKILLS-----------
+\section{Skills}
+\begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+      \textbf{Governance, Risk \& Compliance}{: ISO 27001, NIST CSF, GDPR, policy \& procedure documentation, controls monitoring, audit support} \\
+      \textbf{Monitoring \& Analysis}{: reviewing system flags and alerts, risk assessments, anomaly detection, case documentation, remediation tracking} \\
+      \textbf{Process Automation}{: Python, PowerShell, workflow automation, scripting} \\
+      \textbf{Tools}{: MS Excel, MS PowerPoint, MS Office, SQL}
+    }}
+\end{itemize}
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+\resumeSubHeadingListStart
+    \resumeSubheading
+      {Compliance \& Awareness Intern}{Apr 2024 -- Oct 2024}
+      {Example Security Foundation}{Berlin, Germany}
+      \resumeItemListStart
+        \resumeItem{Delivered security-awareness training to 120+ staff, achieving a 90\% certification pass rate.}
+        \resumeItem{Maintained policy and training documentation, keeping records audit-ready across two quarters.}
+        \resumeItem{Mapped awareness content to ISO 27001 controls so non-specialist staff could follow governance requirements.}
+      \resumeItemListEnd
+    \resumeSubheading
+      {Research Analyst (Working Student)}{Jul 2023 -- Mar 2024}
+      {Example Analytics Lab}{Munich, Germany}
+      \resumeItemListStart
+        \resumeItem{Monitored activity across 30+ data sources, reviewing flags and escalating policy exceptions.}
+        \resumeItem{Tracked remediation items to closure on schedule and documented outcomes for follow-up.}
+        \resumeItem{Prepared Excel reports and dashboards for the leadership team, cutting manual reporting time by 40\%.}
+      \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{Projects}
+\resumeSubHeadingListStart
+    \resumeProjectHeading
+      {\textbf{Compliance Monitoring Homelab} $|$ \emph{Python, REST API}}{}
+      \resumeItemListStart
+        \resumeItem{Built a Python workflow that monitored simulated activity and flagged suspicious events automatically.}
+        \resumeItem{Scored risk and mapped cases to playbook logic, producing response recommendations.}
+      \resumeItemListEnd
+    \resumeProjectHeading
+      {\textbf{Log Monitoring \& Detection Lab} $|$ \emph{Wazuh, Ubuntu, VirtualBox}}{}
+      \resumeItemListStart
+        \resumeItem{Deployed a Wazuh monitoring platform and onboarded a host for centralised log collection and alerting.}
+        \resumeItem{Configured File Integrity Monitoring to detect 100+ unauthorised file changes from a central dashboard.}
+      \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+%-----------EDUCATION-----------
+\section{Education}
+\resumeSubHeadingListStart
+    \resumeSubheading
+      {Example University of Applied Sciences}{Berlin, Germany}
+      {MSc, Business \& Information Security}{Expected Oct 2026}
+    \resumeSubheading
+      {Example State University}{Example City}
+      {B.Sc, Information Technology}{Aug 2019 -- Jun 2023}
+      \resumeItemListStart
+        \resumeItem{GPA 3.6/4.0.}
+      \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+%-----------CERTIFICATIONS-----------
+\section{Certifications}
+\begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+      Microsoft SC-900 \\
+      Google Cybersecurity Certificate (Coursera) \\
+      ISO/IEC 27001 Information Security Associate \\
+      CompTIA Security+ (in progress)
+    }}
+\end{itemize}
+
+%-----------ADDITIONAL-----------
+\section{Additional}
+\begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+      \textbf{Languages}{: English (C1), German (A2)} \\
+      \textbf{Involvement}{: Cybersecurity Club Lead; Student Volunteer} \\
+      \textbf{Awards}{: Dean's List (2022)}
+    }}
+\end{itemize}
+
+%-------------------------------------------
+\end{document}

@@ -1,0 +1,89 @@
+{
+  "score": 96,
+  "page_count": 1,
+  "grade_breakdown": {
+    "parse_integrity": 30,
+    "keyword_coverage": 36,
+    "anti_stuffing": 10,
+    "formatting": 20
+  },
+  "keywords": {
+    "found": [
+      "ISO 27001",
+      "GDPR",
+      "risk assessments",
+      "compliance monitoring",
+      "audit support",
+      "policy documentation",
+      "governance",
+      "Excel",
+      "German"
+    ],
+    "missing": [
+      "DORA"
+    ],
+    "overused": []
+  },
+  "checks": [
+    {
+      "name": "text_extractable",
+      "passed": true,
+      "detail": "2801 characters extracted from 1 page(s)"
+    },
+    {
+      "name": "one_page",
+      "passed": true,
+      "detail": "page_count = 1"
+    },
+    {
+      "name": "email_present",
+      "passed": true,
+      "detail": "alex.carter@example.com"
+    },
+    {
+      "name": "phone_present",
+      "passed": true,
+      "detail": "+49 151 2345 6789"
+    },
+    {
+      "name": "standard_headers",
+      "passed": true,
+      "detail": "found 7/7: Summary, Skills, Experience, Projects, Education, Certifications, Additional"
+    },
+    {
+      "name": "keyword_coverage",
+      "passed": false,
+      "detail": "9/10 keywords found"
+    },
+    {
+      "name": "anti_stuffing",
+      "passed": true,
+      "detail": "no keyword exceeds 5 occurrences"
+    },
+    {
+      "name": "date_style_consistent",
+      "passed": true,
+      "detail": "3 compliant range(s), 0 inconsistent"
+    },
+    {
+      "name": "no_mojibake",
+      "passed": true,
+      "detail": "no icon/private-use glyphs"
+    },
+    {
+      "name": "bullet_length",
+      "passed": true,
+      "detail": "0 bullet line(s), average 0 chars"
+    },
+    {
+      "name": "contact_at_top",
+      "passed": true,
+      "detail": "email/phone within first 300 chars"
+    }
+  ],
+  "recommendations": [
+    "Add missing keyword 'DORA' to Skills or a bullet.",
+    "JD title word 'Global' is missing from the resume - consider mirroring the target role title in the summary or headline.",
+    "JD title word 'GRC' is missing from the resume - consider mirroring the target role title in the summary or headline."
+  ]
+}
