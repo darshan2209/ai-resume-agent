@@ -6,6 +6,8 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![ATS Score](https://img.shields.io/badge/demo%20ATS%20score-96%2F100-brightgreen)
 
+![Demo — tailoring a résumé and raising its ATS score to 96/100](examples/demo.gif)
+
 A hybrid AI agent: **Claude does the judgement** (gap analysis, keyword rewrite, fix loop) and **deterministic Python does the building and scoring** (LaTeX/PDF rendering, ATS audit). The result is reproducible and honest — the agent reframes your real experience to match a target role, but never invents employers, metrics, or certifications.
 
 It runs your résumé through three expert personas in sequence:
