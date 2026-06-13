@@ -34,17 +34,28 @@ from reportlab.platypus import (HRFlowable, Paragraph, SimpleDocTemplate,
 
 EN_DASH = "–"
 BULLET = "•"
+LINK_HEX = "#1155cc"  # blue so email/LinkedIn read as clickable hyperlinks
 
 SECTION_ORDER = ("Summary", "Skills", "Experience", "Projects",
                  "Education", "Certifications", "Additional")
 
-# Shrink ladder: body font first, then leading/spacing, then margins.
-ATTEMPTS = (
-    {"body": 10.0, "lead": 1.18, "space": 1.00, "margin": 1.4 * cm},
-    {"body": 9.5,  "lead": 1.18, "space": 1.00, "margin": 1.4 * cm},
-    {"body": 9.0,  "lead": 1.18, "space": 1.00, "margin": 1.4 * cm},
-    {"body": 9.0,  "lead": 1.06, "space": 0.75, "margin": 1.4 * cm},
-    {"body": 9.0,  "lead": 1.06, "space": 0.70, "margin": 1.1 * cm},
+# Candidate layouts, ordered spacious -> compact. We pick the FIRST that fits
+# on one page, i.e. the most spacious layout that still fits. Short resumes land
+# near the top (large font, airy spacing -> fills the page, easy for HR to read);
+# long resumes fall through to the compact end (shrunk to fit). This both removes
+# bottom whitespace on short resumes and keeps long ones on a single page.
+CANDIDATES = (
+    {"body": 11.0, "lead": 1.30, "space": 2.10, "margin": 1.55 * cm},
+    {"body": 10.5, "lead": 1.28, "space": 1.90, "margin": 1.50 * cm},
+    {"body": 10.5, "lead": 1.24, "space": 1.60, "margin": 1.45 * cm},
+    {"body": 10.0, "lead": 1.24, "space": 1.45, "margin": 1.40 * cm},
+    {"body": 10.0, "lead": 1.20, "space": 1.25, "margin": 1.40 * cm},
+    {"body": 10.0, "lead": 1.18, "space": 1.05, "margin": 1.40 * cm},
+    {"body": 9.5,  "lead": 1.18, "space": 1.00, "margin": 1.35 * cm},
+    {"body": 9.5,  "lead": 1.12, "space": 0.85, "margin": 1.30 * cm},
+    {"body": 9.0,  "lead": 1.14, "space": 0.85, "margin": 1.30 * cm},
+    {"body": 9.0,  "lead": 1.08, "space": 0.72, "margin": 1.20 * cm},
+    {"body": 9.0,  "lead": 1.05, "space": 0.62, "margin": 1.10 * cm},
 )
 
 # Zero-padding, top-aligned, borderless table style for two-column lines.
@@ -67,6 +78,20 @@ def esc(value):
 def date_range(start, end):
     parts = [p for p in (str(start or "").strip(), str(end or "").strip()) if p]
     return (" %s " % EN_DASH).join(parts)
+
+
+def contact_chip(kind, value):
+    """Render a contact field; email and linkedin become clickable hyperlinks.
+    The visible text is unchanged so ATS still extracts it as plain text."""
+    v = str(value or "").strip()
+    if not v:
+        return ""
+    if kind == "email":
+        return '<a href="mailto:%s" color="%s">%s</a>' % (esc(v), LINK_HEX, esc(v))
+    if kind == "linkedin":
+        href = v if v.lower().startswith("http") else "https://" + v
+        return '<a href="%s" color="%s">%s</a>' % (esc(href), LINK_HEX, esc(v))
+    return esc(v)
 
 
 def make_styles(cfg):
@@ -108,7 +133,7 @@ def build_story(data, cfg, avail_width):
     contact = data.get("contact") or {}
     if name:
         story.append(Paragraph(esc(name), styles["name"]))
-    contact_parts = [esc(contact.get(k)) for k in
+    contact_parts = [contact_chip(k, contact.get(k)) for k in
                      ("phone", "email", "linkedin", "location")
                      if str(contact.get(k) or "").strip()]
     if contact_parts:
@@ -260,10 +285,10 @@ def main():
         return 2
 
     pdf_bytes, pages = b"", 0
-    for n, cfg in enumerate(ATTEMPTS, start=1):
+    for n, cfg in enumerate(CANDIDATES, start=1):
         pdf_bytes, pages = render(data, cfg)
-        print("attempt %d: body=%.1fpt lead=x%.2f margin=%.2fcm -> %d page(s)"
-              % (n, cfg["body"], cfg["lead"], cfg["margin"] / cm, pages))
+        print("try %d: body=%.1fpt lead=x%.2f space=x%.2f margin=%.2fcm -> %d page(s)"
+              % (n, cfg["body"], cfg["lead"], cfg["space"], cfg["margin"] / cm, pages))
         if pages <= 1:
             break
 

@@ -24,3 +24,6 @@ env/
 .DS_Store
 Thumbs.db
 *.swp
+
+# Personal skill bundle — contains the real resume, never publish
+dist/
