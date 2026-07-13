@@ -11,7 +11,7 @@ Tailor your master resume (`base/resume.yaml`) to one job description, producing
 
 **TRUTHFULNESS GUARDRAIL (hard rule):** never invent employers, titles, dates, degrees, certifications, tools, or metrics that are not in `base/resume.yaml` — only reframe, reorder, reweight, and re-emphasize true content; numbers may only come from the master resume.
 
-**HUMAN-VOICE GUARDRAIL (hard rule):** the output must not read as AI-written. The banned-word list, banned structures, and required properties in playbook §7 bind every summary, bullet, and cover-letter sentence. If a sentence could appear unchanged in anyone's application to any company, rewrite or delete it.
+**HUMAN-VOICE GUARDRAIL (hard rule):** the output must not read as AI-written. The banned-word list, banned structures, and required properties in playbook §7 bind every summary, bullet, and cover-letter sentence. If a sentence could appear unchanged in anyone's application to any company, rewrite or delete it. Em-dashes are banned in all generated text (en-dash date ranges excepted).
 
 ## STEP 0 — Inputs & market classification
 

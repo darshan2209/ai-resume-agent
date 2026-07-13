@@ -576,8 +576,11 @@ angesprochen" (without naming which value), empty
 
 **Banned structures:**
 - Rule-of-three adjective/noun triplets ("innovative, scalable, and secure solutions").
-- Em-dash chains and "not only X but also Y" / "It's not just X, it's Y" constructions.
-  Measurable lint: more than 1 em-dash per ~150 words is a tell.
+- **Em-dashes (—) are banned outright in all generated output** — resume summaries,
+  bullets, and cover letters. Rephrase with commas, periods, colons, or parentheses.
+  En dashes (–) in date ranges ("04/2024 – 10/2024") are typography, not prose, and
+  stay. The ATS audit and cover-letter renderer flag any em-dash deterministically.
+- "Not only X but also Y" / "It's not just X, it's Y" constructions.
 - Every bullet or paragraph opening with the same rhythm or with "Successfully…".
   Measurable lint: uniform bullet length/structure (every bullet 15–22 words with the
   same opening grammar) is itself a tell — vary deliberately.

@@ -237,6 +237,21 @@ def audit(text: str, page_count: int, keywords, jd_text: str, has_images: bool =
             "contact.photo — German ATS guidance is to keep portal CVs photo-free."
         )
 
+    # Informational: em-dashes in prose are a recognized AI-writing tell and are
+    # banned in generated output (en dashes in date ranges are fine).
+    em_dashes = text.count("—")
+    checks.append({
+        "name": "no_em_dashes",
+        "passed": em_dashes == 0,
+        "detail": ("no em-dashes" if em_dashes == 0
+                   else f"{em_dashes} em-dash(es) found"),
+    })
+    if em_dashes:
+        recommendations.append(
+            f"Text contains {em_dashes} em-dash(es) (—) - rephrase with commas, "
+            "periods, or parentheses; em-dashes read as AI-generated prose."
+        )
+
     # ---- A. Parse integrity (30)
     parse_pts = 0
 

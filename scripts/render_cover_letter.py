@@ -204,6 +204,13 @@ def main():
         print("PAGES=0")
         return 2
 
+    # Em-dashes in letter prose are a recognized AI-writing tell and banned.
+    em_dashes = _s(data.get("subject")).count("—") + sum(
+        _s(p).count("—") for p in data.get("paragraphs") or [])
+    if em_dashes:
+        print("WARNING: %d em-dash(es) in letter text - banned as an AI tell; "
+              "rephrase with commas, periods, or parentheses." % em_dashes)
+
     pdf_bytes, pages = b"", 0
     for n, cfg in enumerate(CANDIDATES, start=1):
         pdf_bytes, pages = render(data, cfg)
