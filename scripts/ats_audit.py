@@ -40,15 +40,17 @@ PHONE_DATEISH_RE = re.compile(
     r"\d{1,2}[./](?:19|20)\d{2}|(?:19|20)\d{2}\s*[-–—]\s*(?:19|20)\d{2}"
 )
 
-STANDARD_HEADERS = [
-    "Summary",
-    "Skills",
-    "Experience",
-    "Projects",
-    "Education",
-    "Certifications",
-    "Additional",
-]
+# Canonical sections with the header strings CV parsers recognize; a section
+# counts as found when ANY of its variants (English or German) appears.
+STANDARD_HEADERS = {
+    "Summary": ["Summary", "Profile", "Profil", "Kurzprofil"],
+    "Skills": ["Skills", "Kenntnisse", "Fähigkeiten", "Kompetenzen"],
+    "Experience": ["Experience", "Berufserfahrung", "Praktische Erfahrung"],
+    "Projects": ["Projects", "Projekte"],
+    "Education": ["Education", "Ausbildung", "Bildungsweg", "Studium"],
+    "Certifications": ["Certifications", "Zertifikate", "Zertifizierungen"],
+    "Additional": ["Additional", "Weitere Angaben", "Sonstiges"],
+}
 
 MONTH = (
     r"(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|"
@@ -57,9 +59,15 @@ MONTH = (
 )
 DASH = r"[-–—]"  # hyphen, en dash, em dash
 
-# The single accepted range style: "Mon YYYY - Mon YYYY" or "Mon YYYY - Present"
+# Accepted range styles:
+#   English CVs: "Mon YYYY - Mon YYYY" or "Mon YYYY - Present"
+#   German CVs (numeric): "MM/YYYY - MM/YYYY" or "MM/YYYY - heute"
 STRICT_RANGE_RE = re.compile(
     rf"^{MONTH}\.?\s+\d{{4}}\s*{DASH}\s*(?:{MONTH}\.?\s+\d{{4}}|Present)$",
+    re.IGNORECASE,
+)
+STRICT_RANGE_NUM_RE = re.compile(
+    rf"^\d{{2}}[./]\d{{4}}\s*{DASH}\s*(?:\d{{2}}[./]\d{{4}}|heute|Present)$",
     re.IGNORECASE,
 )
 EXPECTED_RE = re.compile(rf"^Expected\s+{MONTH}\.?\s+\d{{4}}$", re.IGNORECASE)
@@ -67,9 +75,9 @@ EXPECTED_RE = re.compile(rf"^Expected\s+{MONTH}\.?\s+\d{{4}}$", re.IGNORECASE)
 # Anything that looks like a date range at all (word-month, numeric, bare-year forms).
 LOOSE_RANGE_RE = re.compile(
     rf"(?:[A-Za-z]{{3,9}}\.?\s+(?:19|20)\d{{2}}|\d{{1,2}}[./](?:19|20)\d{{2}}|(?:19|20)\d{{2}})"
-    rf"\s*(?:{DASH}|\bto\b|\buntil\b)\s*"
+    rf"\s*(?:{DASH}|\bto\b|\buntil\b|\bbis\b)\s*"
     rf"(?:[A-Za-z]{{3,9}}\.?\s+(?:19|20)\d{{2}}|\d{{1,2}}[./](?:19|20)\d{{2}}|(?:19|20)\d{{2}}"
-    rf"|Present|Current|Now|Ongoing)",
+    rf"|Present|Current|Now|Ongoing|heute|laufend)",
     re.IGNORECASE,
 )
 
@@ -132,6 +140,27 @@ def find_phone(text: str):
     return None
 
 
+def pdf_has_images(pdf_path: Path):
+    """True if any page carries an embedded image XObject (e.g. a header photo).
+    German ATS guidance: portal-submitted CVs should be photo-free."""
+    try:
+        reader = PdfReader(str(pdf_path))
+        for page in reader.pages:
+            resources = page.get("/Resources") or {}
+            xobjects = resources.get("/XObject")
+            if not xobjects:
+                continue
+            for obj in xobjects.get_object().values():
+                try:
+                    if obj.get_object().get("/Subtype") == "/Image":
+                        return True
+                except Exception:
+                    continue
+        return False
+    except Exception:
+        return False
+
+
 def extract_pdf_text(pdf_path: Path):
     """Return (text, page_count). Degrades to ('', 0) on extraction failure."""
     try:
@@ -157,7 +186,7 @@ def load_keywords(path: Path):
     normalized form, preserving order and original spelling."""
     keywords = []
     seen = set()
-    for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
+    for raw in path.read_text(encoding="utf-8-sig", errors="replace").splitlines():
         line = raw.strip()
         if not line or line.startswith("#"):
             continue
@@ -188,10 +217,25 @@ def jd_title_words(jd_text: str):
 # ------------------------------------------------------------------- audit
 
 
-def audit(text: str, page_count: int, keywords, jd_text: str):
+def audit(text: str, page_count: int, keywords, jd_text: str, has_images: bool = False):
     checks = []
     recommendations = []
     norm_text = normalize_text(text)
+
+    # Informational (never affects the score): a photo is acceptable in email
+    # applications but should be absent from ATS-portal submissions.
+    checks.append({
+        "name": "no_embedded_image",
+        "passed": not has_images,
+        "detail": ("no embedded images" if not has_images else
+                   "embedded image found (header photo?)"),
+    })
+    if has_images:
+        recommendations.append(
+            "PDF contains an embedded image (photo?). Fine for direct email "
+            "applications; for ATS-portal submissions rebuild without "
+            "contact.photo — German ATS guidance is to keep portal CVs photo-free."
+        )
 
     # ---- A. Parse integrity (30)
     parse_pts = 0
@@ -248,17 +292,20 @@ def audit(text: str, page_count: int, keywords, jd_text: str):
     })
 
     headers_found = []
-    for h in STANDARD_HEADERS:
-        base = h[:-1] if h.endswith("s") else h
-        if re.search(rf"\b{re.escape(base)}s?\b", text, re.IGNORECASE):
-            headers_found.append(h)
+    for canonical, variants in STANDARD_HEADERS.items():
+        for variant in variants:
+            base = variant[:-1] if variant.endswith("s") else variant
+            if re.search(rf"\b{re.escape(base)}s?\b", text, re.IGNORECASE):
+                headers_found.append(canonical)
+                break
     headers_ok = len(headers_found) >= 4
     if headers_ok:
         parse_pts += 5
     else:
         missing_headers = [h for h in STANDARD_HEADERS if h not in headers_found]
         recommendations.append(
-            "Only {} standard section header(s) found ({}). Use at least 4 of: {}.".format(
+            "Only {} standard section header(s) found ({}). Use at least 4 of: {} "
+            "(English or German variants).".format(
                 len(headers_found),
                 ", ".join(headers_found) if headers_found else "none",
                 ", ".join(missing_headers),
@@ -327,7 +374,7 @@ def audit(text: str, page_count: int, keywords, jd_text: str):
     for line in text.splitlines():
         for m in LOOSE_RANGE_RE.finditer(line):
             snippet = re.sub(r"\s+", " ", m.group(0)).strip()
-            if STRICT_RANGE_RE.match(snippet):
+            if STRICT_RANGE_RE.match(snippet) or STRICT_RANGE_NUM_RE.match(snippet):
                 n_strict += 1
             else:
                 bad_ranges.append(snippet)
@@ -336,8 +383,9 @@ def audit(text: str, page_count: int, keywords, jd_text: str):
         fmt_pts += 5
     else:
         recommendations.append(
-            "Inconsistent date format(s): {}. Use 'Mon YYYY - Mon YYYY', "
-            "'Mon YYYY - Present', or 'Expected Mon YYYY' everywhere.".format(
+            "Inconsistent date format(s): {}. Use 'Mon YYYY - Mon YYYY' / "
+            "'Mon YYYY - Present' / 'Expected Mon YYYY' (English CV) or "
+            "'MM/YYYY - MM/YYYY' / 'MM/YYYY - heute' (German CV) everywhere.".format(
                 "; ".join(f"'{b}'" for b in bad_ranges[:3])
             )
         )
@@ -481,7 +529,8 @@ def main(argv=None):
                   file=sys.stderr)
 
     text, page_count = extract_pdf_text(pdf_path)
-    report = audit(text, page_count, keywords, jd_text)
+    report = audit(text, page_count, keywords, jd_text,
+                   has_images=pdf_has_images(pdf_path))
 
     out_path = Path(args.json_out)
     out_path.parent.mkdir(parents=True, exist_ok=True)

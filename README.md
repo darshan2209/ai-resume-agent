@@ -1,6 +1,6 @@
 # 🤖 AI Resume Rewriting Agent
 
-> Paste a job description → get a tailored, ATS-optimized, one-page résumé as a PDF and an Overleaf-ready LaTeX file.
+> Paste a job description → get a tailored, ATS-optimized, one-page résumé (PDF + Overleaf-ready LaTeX) **and a market-correct cover letter** — tuned for the German and wider European job market.
 
 ![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -26,13 +26,18 @@ The example résumé ([`base/resume.example.yaml`](base/resume.example.yaml), fi
 
 Full demo output: [`examples/sample-output/`](examples/sample-output/) — PDF, LaTeX, and the [ATS report JSON](examples/sample-output/ats_report.json).
 
-## How it works — the 5-step pipeline
+## How it works — the pipeline
 
-1. **Inputs.** Take the job description, read your master résumé (`base/resume.yaml`), create an output folder for this application.
-2. **Gap analysis** *(recruiter persona)* → `gap_analysis.md`: match score 1–10, top-10 missing ATS keywords (exact JD phrases), skills gaps, terminology, seniority-language check, unaddressed requirements, missing soft skills.
-3. **Rewrite** *(writer persona)* → a tailored `resume.yaml`: "Achieved X by Y resulting in Z" bullets, a different action verb per bullet, 2–3 quantified results per role, top-10 keywords woven in naturally. **Nothing is invented** — only true content is reframed and re-weighted.
+1. **Inputs & market classification.** Take the job description, read your master résumé (`base/resume.yaml`) and the [Germany/Europe market playbook](.claude/skills/resume-agent/references/de-eu-playbook.md), classify the JD (language, country, company type, role type) and decide CV language, section labels, photo policy, and keyword-mirroring plan.
+2. **Gap analysis** *(recruiter persona)* → `gap_analysis.md`: match score 1–10, top-10 missing ATS keywords (exact JD phrases, in the JD's language), skills gaps, terminology, seniority-language check, unaddressed requirements, market-fit flags (work authorization, availability, German level).
+3. **Rewrite** *(writer persona)* → a tailored `resume.yaml`: "Achieved X by Y resulting in Z" bullets, a different action verb per bullet, 2–3 quantified results per role, top-10 keywords woven in naturally. **Nothing is invented** — only true content is reframed and re-weighted — and **nothing may read as AI-written** (the playbook bans the giveaway words and structures).
 4. **ATS scan** *(ATS-engine persona)* → renders the résumé, runs the deterministic audit, writes `ats_report.md` with estimated rank, red flags, and weak sections.
-5. **Fix loop + export.** Edit and rebuild until **ATS score ≥ 92 and the PDF is exactly one page** (max 4 iterations), then deliver `resume.pdf` (local, ATS-safe) and `resume.tex` (for [Overleaf](https://overleaf.com)).
+5. **Fix loop.** Edit and rebuild until **ATS score ≥ 92 and the PDF is exactly one page** (max 4 iterations).
+6. **Cover letter + export.** Write and render a DIN 5008-informed cover letter (German Anschreiben or English letter, 250–400 words), then deliver `resume.pdf`, `resume.tex` (for [Overleaf](https://overleaf.com)), and `cover_letter.pdf` with an application-package checklist (enclosures, combined-PDF order, knockout-question answers).
+
+### Germany/Europe support
+
+The agent follows a researched, source-verified playbook for the German market (and a country table for the rest of Europe): tabular-CV conventions, photo policy by company type, work-authorization phrasing for non-EU applicants, Werkstudent availability/conversion framing, DIN 5008 Anschreiben structure, German↔English GRC keyword pairs, and the parse-and-rank reality of German ATS (Personio, SuccessFactors, softgarden & co). German CVs get German section headers (`labels:`), `MM/YYYY` dates, and `ngerman` LaTeX; the audit accepts both English and German styles.
 
 ## Quickstart
 
@@ -83,30 +88,39 @@ ai-resume-agent/
 │   ├── resume.example.yaml   # fictional template — copy to resume.yaml (gitignored)
 │   └── resume.yaml           # YOUR master résumé (gitignored, never committed)
 ├── scripts/
-│   ├── render_tex.py         # YAML → Jake's-Resume LaTeX (for Overleaf)
-│   ├── render_pdf.py         # YAML → ATS-safe 1-page PDF (reportlab, auto-shrink)
-│   ├── ats_audit.py          # deterministic ATS scorer
+│   ├── render_tex.py         # YAML → Jake's-Resume LaTeX (for Overleaf; EN/DE labels)
+│   ├── render_pdf.py         # YAML → ATS-safe 1-page PDF (reportlab, auto-shrink,
+│   │                         #   optional German labels + header photo)
+│   ├── render_cover_letter.py# YAML → DIN 5008-informed 1-page cover letter PDF
+│   ├── ats_audit.py          # deterministic ATS scorer (EN + DE headers/dates)
 │   └── build.py              # orchestrator: tex + pdf + audit in one call
 ├── templates/
 │   └── jakes_resume.tex.j2   # Jake's Resume, adapted (no icons → ATS-clean)
 ├── samples/                  # a sample JD + keyword list to try the pipeline
 ├── examples/sample-output/   # committed demo run (scores 96/100)
 └── .claude/skills/           # the Claude Code agent definition
+    └── resume-agent/references/de-eu-playbook.md   # Germany/EU market playbook
 ```
 
 ## Résumé YAML schema
 
 ```yaml
+lang: en | de                                          # optional; de switches LaTeX babel to ngerman
+labels: {summary, skills, experience, ...}             # optional section-header overrides (German CVs)
 name: str
-contact: {phone, email, linkedin, location, tagline}   # linkedin without https://; tagline may be ""
+contact: {phone, email, linkedin, portfolio, location, tagline, photo}
+    # linkedin without https://; tagline may be ""; photo = optional image path (German-style CVs)
 summary: str                                           # one paragraph
 skills: [{category: str, items: str}]                  # items = ONE comma-separated string
-experience: [{company, title, location, start, end, bullets: [str]}]   # end may be "Present"
+experience: [{company, title, location, start, end, bullets: [str]}]   # end may be "Present"/"heute"
 projects: [{name, tech: str, bullets: [str]}]          # tech = ONE comma-separated string
 education: [{school, degree, location, start, end, notes: [str]}]      # start may be ""; notes may be []
 certifications: [str]
 additional: [{label: str, text: str}]
 ```
+
+The cover-letter YAML schema (sender/recipient blocks, date line, subject, salutation,
+paragraphs, closing, enclosures) is documented in the skill definition.
 
 ## Why it stays honest
 

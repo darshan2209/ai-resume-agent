@@ -39,6 +39,22 @@ LINK_HEX = "#1155cc"  # blue so email/LinkedIn read as clickable hyperlinks
 SECTION_ORDER = ("Summary", "Skills", "Experience", "Projects",
                  "Education", "Certifications", "Additional")
 
+# Section header labels; overridable per-document via a top-level `labels:`
+# mapping in the YAML (e.g. labels: {experience: Berufserfahrung}) so German
+# CVs can carry the header strings German ATS parsers recognize.
+DEFAULT_LABELS = {
+    "summary": "Summary",
+    "skills": "Skills",
+    "experience": "Experience",
+    "projects": "Projects",
+    "education": "Education",
+    "certifications": "Certifications",
+    "additional": "Additional",
+}
+
+PHOTO_WIDTH = 2.8  # cm; passport-style header photo (German Lebenslauf option)
+PHOTO_MAX_HEIGHT = 3.6  # cm
+
 # Candidate layouts, ordered spacious -> compact. We pick the FIRST that fits
 # on one page, i.e. the most spacious layout that still fits. Short resumes land
 # near the top (large font, airy spacing -> fills the page, easy for HR to read);
@@ -88,7 +104,7 @@ def contact_chip(kind, value):
         return ""
     if kind == "email":
         return '<a href="mailto:%s" color="%s">%s</a>' % (esc(v), LINK_HEX, esc(v))
-    if kind == "linkedin":
+    if kind in ("linkedin", "portfolio"):
         href = v if v.lower().startswith("http") else "https://" + v
         return '<a href="%s" color="%s">%s</a>' % (esc(href), LINK_HEX, esc(v))
     return esc(v)
@@ -123,28 +139,68 @@ def make_styles(cfg):
     }
 
 
+def resolve_labels(data):
+    """Merge the optional top-level `labels:` mapping over the defaults."""
+    overrides = data.get("labels") or {}
+    labels = dict(DEFAULT_LABELS)
+    for key, value in overrides.items():
+        k = str(key or "").strip().lower()
+        v = str(value or "").strip()
+        if k in labels and v:
+            labels[k] = v
+    return labels
+
+
 def build_story(data, cfg, avail_width):
     styles = make_styles(cfg)
     sp = cfg["space"]
+    labels = resolve_labels(data)
     story = []
 
     # ---- Header block --------------------------------------------------
     name = str(data.get("name") or "").strip()
     contact = data.get("contact") or {}
+    header = []
     if name:
-        story.append(Paragraph(esc(name), styles["name"]))
+        header.append(Paragraph(esc(name), styles["name"]))
     contact_parts = [contact_chip(k, contact.get(k)) for k in
-                     ("phone", "email", "linkedin", "location")
+                     ("phone", "email", "linkedin", "portfolio", "location")
                      if str(contact.get(k) or "").strip()]
     if contact_parts:
-        story.append(Paragraph(" | ".join(contact_parts), styles["contact"]))
+        header.append(Paragraph(" | ".join(contact_parts), styles["contact"]))
     tagline = str(contact.get("tagline") or "").strip()
     if tagline:
-        story.append(Paragraph("<i>%s</i>" % esc(tagline), styles["tagline"]))
+        header.append(Paragraph("<i>%s</i>" % esc(tagline), styles["tagline"]))
+
+    # Optional header photo (contact: photo: <path>) for German-style CVs.
+    # Placed right of the name/contact block; skipped silently if unset and
+    # with a warning if the file is missing.
+    photo_path = str(contact.get("photo") or "").strip()
+    if photo_path and Path(photo_path).is_file():
+        from reportlab.platypus import Image as RLImage
+        img = RLImage(photo_path, width=PHOTO_WIDTH * cm,
+                      height=PHOTO_MAX_HEIGHT * cm, kind="proportional")
+        photo_col = (PHOTO_WIDTH + 0.3) * cm
+        table = Table([[header, img]],
+                      colWidths=[avail_width - photo_col, photo_col])
+        table.setStyle(TableStyle([
+            ("LEFTPADDING", (0, 0), (-1, -1), 0),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+            ("TOPPADDING", (0, 0), (-1, -1), 0),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+            ("VALIGN", (0, 0), (0, 0), "MIDDLE"),  # name block centers on photo
+            ("VALIGN", (1, 0), (1, 0), "TOP"),
+        ]))
+        story.append(table)
+    else:
+        if photo_path:
+            print("WARNING: photo file not found, rendering without photo: %s"
+                  % photo_path)
+        story.extend(header)
 
     # ---- Helpers --------------------------------------------------------
     def section(title):
-        story.append(Paragraph(title, styles["h"]))
+        story.append(Paragraph(esc(title), styles["h"]))
         story.append(HRFlowable(width="100%", thickness=0.7,
                                 color=colors.black, spaceBefore=1.5,
                                 spaceAfter=3 * sp))
@@ -167,13 +223,13 @@ def build_story(data, cfg, avail_width):
     # ---- Summary ---------------------------------------------------------
     summary = str(data.get("summary") or "").strip()
     if summary:
-        section("Summary")
+        section(labels["summary"])
         story.append(Paragraph(esc(summary), styles["body"]))
 
     # ---- Skills ------------------------------------------------------------
     skills = data.get("skills") or []
     if skills:
-        section("Skills")
+        section(labels["skills"])
         for cat in skills:
             category = esc((cat or {}).get("category"))
             items = esc((cat or {}).get("items"))
@@ -183,7 +239,7 @@ def build_story(data, cfg, avail_width):
     # ---- Experience ---------------------------------------------------------
     experience = data.get("experience") or []
     if experience:
-        section("Experience")
+        section(labels["experience"])
         for i, job in enumerate(experience):
             job = job or {}
             if i:
@@ -198,7 +254,7 @@ def build_story(data, cfg, avail_width):
     # ---- Projects --------------------------------------------------------
     projects = data.get("projects") or []
     if projects:
-        section("Projects")
+        section(labels["projects"])
         for i, proj in enumerate(projects):
             proj = proj or {}
             if i:
@@ -215,7 +271,7 @@ def build_story(data, cfg, avail_width):
     # ---- Education ---------------------------------------------------------
     education = data.get("education") or []
     if education:
-        section("Education")
+        section(labels["education"])
         for i, edu in enumerate(education):
             edu = edu or {}
             if i:
@@ -231,14 +287,14 @@ def build_story(data, cfg, avail_width):
     certifications = [c for c in (data.get("certifications") or [])
                       if str(c or "").strip()]
     if certifications:
-        section("Certifications")
+        section(labels["certifications"])
         joined = (" %s " % BULLET).join(esc(c) for c in certifications)
         story.append(Paragraph(joined, styles["body"]))
 
     # ---- Additional --------------------------------------------------------
     additional = data.get("additional") or []
     if additional:
-        section("Additional")
+        section(labels["additional"])
         for item in additional:
             item = item or {}
             story.append(Paragraph("<b>%s:</b> %s" % (esc(item.get("label")),

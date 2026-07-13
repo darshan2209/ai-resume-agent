@@ -38,6 +38,18 @@ from jinja2 import Environment, FileSystemLoader, StrictUndefined
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
 TEMPLATE_NAME = "jakes_resume.tex.j2"
 
+# Section header labels; overridable per-document via a top-level `labels:`
+# mapping in the YAML so German CVs carry parser-recognized German headers.
+DEFAULT_LABELS = {
+    "summary": "Summary",
+    "skills": "Skills",
+    "experience": "Experience",
+    "projects": "Projects",
+    "education": "Education",
+    "certifications": "Certifications",
+    "additional": "Additional",
+}
+
 # Single-pass replacement table: keys are matched simultaneously by one regex,
 # so replacement text (which itself contains specials) is never re-escaped.
 _LATEX_SPECIALS = {
@@ -95,6 +107,7 @@ def build_context(data):
     phone = _s(contact.get("phone"))
     email = _s(contact.get("email"))
     linkedin = _s(contact.get("linkedin"))
+    portfolio = _s(contact.get("portfolio"))
     location = _s(contact.get("location"))
     tagline = _s(contact.get("tagline"))
 
@@ -109,6 +122,12 @@ def build_context(data):
         else:
             url = "https://" + linkedin
         parts.append(r"\href{%s}{%s}" % (url_escape(url), latex_escape(linkedin)))
+    if portfolio:
+        if portfolio.lower().startswith(("http://", "https://")):
+            url = portfolio
+        else:
+            url = "https://" + portfolio
+        parts.append(r"\href{%s}{%s}" % (url_escape(url), latex_escape(portfolio)))
     if location:
         parts.append(latex_escape(location))
 
@@ -167,6 +186,15 @@ def build_context(data):
         if label or text:
             additional.append({"label": label, "text": text})
 
+    label_overrides = data.get("labels") or {}
+    labels = {}
+    for key, default in DEFAULT_LABELS.items():
+        value = _s(label_overrides.get(key)) if isinstance(label_overrides, dict) else ""
+        labels[key] = latex_escape(value or default)
+
+    lang = _s(data.get("lang")).lower()
+    babel_lang = "ngerman" if lang == "de" else "english"
+
     return {
         "name": latex_escape(_s(data.get("name"))),
         "contact_line": " $|$ ".join(parts),
@@ -178,6 +206,8 @@ def build_context(data):
         "education": education,
         "certifications": certifications,
         "additional": additional,
+        "labels": labels,
+        "babel_lang": babel_lang,
     }
 
 
