@@ -127,7 +127,8 @@ def build_context(data):
             url = portfolio
         else:
             url = "https://" + portfolio
-        parts.append(r"\href{%s}{%s}" % (url_escape(url), latex_escape(portfolio)))
+        # Compact "Portfolio" label; the URL lives in the hyperlink target.
+        parts.append(r"\href{%s}{Portfolio}" % url_escape(url))
     if location:
         parts.append(latex_escape(location))
 

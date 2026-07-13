@@ -108,7 +108,7 @@ labels: {summary, skills, experience, projects,        # optional section-header
          education, certifications, additional}        #   (German strings per playbook §1)
 name: str
 contact: {phone, email, linkedin, portfolio, location, tagline, photo}
-    # linkedin without https://; tagline may be ""; photo = optional image path
+    # linkedin without https://; portfolio renders as a "Portfolio" hyperlink; tagline may be ""; photo = optional image path
     # (German traditional companies only, playbook §1)
 summary: str                                           # one paragraph
 skills: [{category: str, items: str}]                  # items = ONE comma-separated string

@@ -109,7 +109,7 @@ lang: en | de                                          # optional; de switches L
 labels: {summary, skills, experience, ...}             # optional section-header overrides (German CVs)
 name: str
 contact: {phone, email, linkedin, portfolio, location, tagline, photo}
-    # linkedin without https://; tagline may be ""; photo = optional image path (German-style CVs)
+    # linkedin without https://; portfolio renders as a "Portfolio" hyperlink; tagline may be ""; photo = optional image path (German-style CVs)
 summary: str                                           # one paragraph
 skills: [{category: str, items: str}]                  # items = ONE comma-separated string
 experience: [{company, title, location, start, end, bullets: [str]}]   # end may be "Present"/"heute"

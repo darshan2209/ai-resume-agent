@@ -97,8 +97,10 @@ def date_range(start, end):
 
 
 def contact_chip(kind, value):
-    """Render a contact field; email and linkedin become clickable hyperlinks.
-    The visible text is unchanged so ATS still extracts it as plain text."""
+    """Render a contact field; email/linkedin/portfolio become clickable
+    hyperlinks. Email and LinkedIn keep their address as visible text (ATS
+    extracts them as plain text); the portfolio renders as a compact
+    "Portfolio" label with the URL only in the link annotation."""
     v = str(value or "").strip()
     if not v:
         return ""
@@ -106,7 +108,8 @@ def contact_chip(kind, value):
         return '<a href="mailto:%s" color="%s">%s</a>' % (esc(v), LINK_HEX, esc(v))
     if kind in ("linkedin", "portfolio"):
         href = v if v.lower().startswith("http") else "https://" + v
-        return '<a href="%s" color="%s">%s</a>' % (esc(href), LINK_HEX, esc(v))
+        label = "Portfolio" if kind == "portfolio" else esc(v)
+        return '<a href="%s" color="%s">%s</a>' % (esc(href), LINK_HEX, label)
     return esc(v)
 
 
