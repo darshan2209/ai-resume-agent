@@ -98,7 +98,7 @@ python scripts/build.py RESUME_YAML --jd JD_TXT --keywords KEYWORDS_TXT --outdir
     # copies RESUME_YAML to DIR/resume.yaml. Prints "ATS_SCORE=<n>" and "PAGES=<n>".
 
 python scripts/render_cover_letter.py COVER_YAML OUT_PDF
-    # DIN 5008-informed one-page cover letter PDF (works for EN and DE letters).
+    # DIN 5008-informed one-page cover letter PDF, justified Times serif (EN and DE).
     # Prints "WORDS=<n>" and "PAGES=<n>". Exit 0 if 1 page, exit 2 if not.
 ```
 

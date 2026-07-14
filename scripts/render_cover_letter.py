@@ -4,12 +4,15 @@
 Usage:
     python render_cover_letter.py COVER_YAML OUT_PDF
 
-ATS-safe one-page cover letter PDF (reportlab, Helvetica only). Layout follows
-German Anschreiben conventions (DIN 5008-informed): sender block, recipient
-block, right-aligned city+date line, bold subject line (without a "Betreff:"
-prefix), salutation, body paragraphs, closing formula, typed name, optional
-enclosures ("Anlagen") line. The same layout doubles as a clean international
-English letter -- content decides the register, not the renderer.
+ATS-safe one-page cover letter PDF (reportlab). Set in the Times serif family
+(reportlab's standard-PDF "Times-Roman" / "Times-Bold" -- visually equivalent to
+Times New Roman, portable with no font files, and extracts as clean ATS text),
+with JUSTIFIED body paragraphs. Layout follows German Anschreiben conventions
+(DIN 5008-informed): sender block, recipient block, right-aligned city+date
+line, bold subject line (without a "Betreff:" prefix), salutation, body
+paragraphs, closing formula, typed name, optional enclosures ("Anlagen") line.
+The same layout doubles as a clean international English letter -- content
+decides the register, not the renderer.
 
 Single-page enforcement mirrors render_pdf.py: candidate layouts are tried
 from spacious to compact and the first that fits is kept. Prints "WORDS=<n>"
@@ -41,7 +44,7 @@ from xml.sax.saxutils import escape as xml_escape
 
 import yaml
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_LEFT, TA_RIGHT
+from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
@@ -75,17 +78,19 @@ def _s(value):
 def make_styles(cfg):
     body = cfg["body"]
     lead = body * cfg["lead"]
-    base = dict(fontName="Helvetica", fontSize=body, leading=lead,
+    # Times serif family (standard PDF fonts; <b>/<i> markup maps to Times-Bold/
+    # Times-Italic automatically). Body paragraphs are justified.
+    base = dict(fontName="Times-Roman", fontSize=body, leading=lead,
                 textColor=colors.black)
     return {
-        "sender_name": ParagraphStyle("sender_name", fontName="Helvetica-Bold",
+        "sender_name": ParagraphStyle("sender_name", fontName="Times-Bold",
                                       fontSize=body + 2, leading=(body + 2) * 1.2,
                                       alignment=TA_LEFT, spaceAfter=1),
         "block": ParagraphStyle("block", alignment=TA_LEFT, **base),
         "date": ParagraphStyle("date", alignment=TA_RIGHT, **base),
-        "subject": ParagraphStyle("subject", fontName="Helvetica-Bold",
+        "subject": ParagraphStyle("subject", fontName="Times-Bold",
                                   fontSize=body, leading=lead, alignment=TA_LEFT),
-        "para": ParagraphStyle("para", alignment=TA_LEFT,
+        "para": ParagraphStyle("para", alignment=TA_JUSTIFY,
                                spaceAfter=cfg["gap"], **base),
     }
 
