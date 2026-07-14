@@ -11,7 +11,7 @@ Tailor your master resume (`base/resume.yaml`) to one job description, producing
 
 **TRUTHFULNESS GUARDRAIL (hard rule):** never invent employers, titles, dates, degrees, certifications, tools, or metrics that are not in `base/resume.yaml` — only reframe, reorder, reweight, and re-emphasize true content; numbers may only come from the master resume.
 
-**HUMAN-VOICE GUARDRAIL (hard rule):** the output must not read as AI-written. The banned-word list, banned structures, and required properties in playbook §7 bind every summary, bullet, and cover-letter sentence. If a sentence could appear unchanged in anyone's application to any company, rewrite or delete it. Em-dashes are banned in all generated text (en-dash date ranges excepted).
+**HUMAN-VOICE GUARDRAIL (hard rule):** the output must not read as AI-written. The banned-word list, banned structures, and required properties in playbook §7 bind every summary sentence, skills entry, resume bullet, and cover-letter sentence (buzzwords are banned across the WHOLE resume, not only the cover letter). If a sentence could appear unchanged in anyone's application to any company, rewrite or delete it. Em-dashes are banned in all generated text (en-dash date ranges excepted).
 
 ## STEP 0 — Inputs & market classification
 
@@ -40,9 +40,11 @@ Persona: an expert resume writer for the German/European market. Write `<outdir>
 
 - Achievement formula: "Achieved X by Y resulting in Z" — but numbers plausible and contextualized, never marketing-precise (playbook §7); in traditional-company applications responsibility framing ("responsible for rollout to 400+ users") is equally valid.
 - One page. Bullets max 2 lines each.
+- **Every experience entry gets 3–4 bullet points (minimum 3, target 4)**, drawn ONLY from true material in the master resume. If a role genuinely lacks enough true content for 3 bullets, keep what is true and tell the user to add material to that role in base/resume.yaml — never pad or invent (truthfulness guardrail is absolute).
+- **Summary = 2–4 concrete sentences** (role, level, specialization, 1–2 signature capabilities mirrored to the JD; no buzzwords, no "passionate/motivated" opener). **Skills = real tools, frameworks, and regulations only**, categorized and JD-mirrored — never soft-skill fluff as a skill. Lead each experience with its most JD-relevant bullet.
 - Present tense for the current role, past tense for prior roles.
-- Every bullet opens with a DIFFERENT strong action verb; no banned words (playbook §7).
-- 2–3 quantified results per role (numbers only from the master resume).
+- Every bullet opens with a DIFFERENT strong action verb; **zero buzzwords anywhere in the resume — summary, skills entries, and every bullet (playbook §7 banned lists)**.
+- 2–3 quantified results per role where the master resume supports numbers (numbers only from the master resume).
 - Weave the top-10 keywords from Step 1 naturally — never stuff; mirror exact JD phrases in the JD's language.
 - Reorder skills categories and bullets so the most JD-relevant content leads.
 - Apply the playbook's market rules per the detected mode (§0 mode table): Werkstudent mode → availability hours + conversion-intent framing (§5); entry-level mode → start-date line, ownership-verb bullets, post-study-permit wording, §5 salary bands. Always: work-authorization line for non-EU candidates (§1/§5), mandatory languages line with honest CEFR levels (§1), no personal data beyond the allowed set (§1).

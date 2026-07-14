@@ -568,6 +568,14 @@ environment, proven track record, "I am confident that", "aligns perfectly", "re
 with me", "testament to", "in today's digital landscape", "excited to contribute",
 "hit the ground running", "I am writing to formally express my strong interest", and the
 "leveraged X to drive Y, resulting in Z" bullet template.
+**Also banned as CV/skills/summary filler (this applies to the WHOLE resume — summary,
+skills entries, and every bullet — not only cover letters):** team player,
+detail-oriented, self-motivated, hard-working, go-getter, strong work ethic,
+excellent/strong communication skills, think outside the box, go-to person, highly
+motivated, driven, enthusiastic, results-oriented, extensive experience, track record of
+success, value-add, best-of-breed, well-versed, seasoned, ninja / guru / rockstar. State
+the concrete evidence instead of the label (a bullet showing you documented for 150 staff
+proves communication; the word "communicative" proves nothing).
 **Banned (German):** "hochmotiviert", "Ich bin ein absoluter Teamplayer",
 "leidenschaftlich", "ich brenne für", "mit großer Leidenschaft", "spannende
 Herausforderung", "dynamisches Umfeld", "eintauchen", "Ihre Werte haben mich besonders
